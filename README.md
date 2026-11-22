@@ -11,4 +11,18 @@ So we get the playcount data out of Apple Music via **manual data entry** into a
 then use this script to process the excel sheet and repeatedly hit the relevant navidrome APIs for scrobbling.
 
 
+## Prep
 
+Set up navidrome credentials and url in the .env file.
+
+Populate the excel sheet with artist, album, song title, playcount, and last played time
+
+## Test
+
+pytest command tbd
+
+## Go!
+
+```
+uv run --env-file .env musicmigration
+```
