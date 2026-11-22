@@ -52,20 +52,20 @@ class Navidrome:
 
         # Search the song title alone, maybe we'll get lucky
         results = self.conn.search2(title)
+
+        if results.song is None:
+            print(f"title {title} had no matches")
+            return ""
+
         if len(results.song) == 1:
             print(f"title {title} was unique!")
             return results.song[0].id
-
-        if not len(results.song):
-            print(f"title {title} had no matches")
-            # throw an error here for better catching?
-            return ""
 
         print(f"title {title} had multiple matches, continuing to further checks")
         # loop over results, see if artist and album will differentiate
         potential_songs = []
         for song in results.song:
-            if song.artist == artist and song.album == album:
+            if song.artist == artist and song.album == album and song.title == title:
                 potential_songs.append(song)
 
         if len(potential_songs) == 1:
@@ -74,5 +74,6 @@ class Navidrome:
         if not len(potential_songs):
             print(f"title {title} with artist {artist} and album {album} did not match, find it manually")
         else:
-            print(f"title {title} with artist {artist} and album {album} had multiple matches, find it manually")
+            ids = [song.id for song in potential_songs]
+            print(f"title {title} with artist {artist} and album {album} had multiple matches {ids}, find it manually")
         return ""
