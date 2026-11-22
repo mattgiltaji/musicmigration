@@ -41,3 +41,10 @@ class TestNavidrome:
         expected = "6tmtPWqaZeEVAFxc2OOP9z"
         actual = navi.get_song_id("21st Century (Digital Boy)", "Bad Religion", "All Ages")
         assert expected == actual
+
+    @pytest.skip
+    def test_get_song_id_same_tile_same_album_returns_empty(self, navi):
+        # this is a spurious pass, we might need to seed some test data for this use case
+        expected = ""
+        actual = navi.get_song_id("Amaranth", "Nightwish", "Dark Passion Play (special edition)")
+        assert expected == actual

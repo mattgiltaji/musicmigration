@@ -26,3 +26,9 @@ pytest command tbd
 ```
 uv run --env-file .env musicmigration
 ```
+
+### Miscellaneous Notes
+* navidrome (or subsonic) will append the subtitle to songs 
+and album comment to albums, so "Cool Album" will actually need to be
+"Cool Album (Deluxe Edition)" to exact match in the song lookup.
+Same for "Banger" and "Banger (explicit)" 
