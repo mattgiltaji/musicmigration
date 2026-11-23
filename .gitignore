@@ -1,5 +1,6 @@
 # project custom
 local.env
+data/*.xlsx
 
 # From https://github.com/github/gitignore/blob/main/Python.gitignore
 

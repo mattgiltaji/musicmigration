@@ -5,7 +5,10 @@ description = "Personal script for migrating playcount metatadata off apple musi
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "pandas>=3.1.1",
     "py-opensonic>=11.0.0",
+    "python-calamine>=0.9.1",
+    "xlsxwriter>=3.3.4",
 ]
 
 [project.scripts]
