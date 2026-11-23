@@ -26,6 +26,7 @@ def main() -> None:
                     ex.df.at[row.Index, "song_id"] = song_id
                 except ValueError as err:
                     ex.df.at[row.Index, "notes"] = str(err)
+                    continue
             else:
                 song_id = row.song_id
 
