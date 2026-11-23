@@ -27,24 +27,21 @@ class TestNavidrome:
         actual = navi.get_song_id("Antigravity", "STARSET", "Transmissions")
         assert expected == actual
 
-    def test_get_nonsense_song_id_returns_empty(self, navi):
-        expected = ""
-        actual = navi.get_song_id("aw43985123045bz", "artist", "album")
-        assert expected == actual
+    def test_get_nonsense_song_id_errors(self, navi):
+        with pytest.raises(navidrome.NoTitleMatchError):
+            navi.get_song_id("aw43985123045bz", "artist", "album")
 
-    def test_get_song_id_nonsense_artist_returns_empty(self, navi):
-        expected = ""
-        actual = navi.get_song_id("Hurt", "ez1234567", "Hurt")
-        assert expected == actual
+    def test_get_song_id_nonsense_artist_errors(self, navi):
+        with pytest.raises(navidrome.NoComboMatchError):
+            navi.get_song_id("Hurt", "ez1234567", "Hurt")
 
     def test_get_song_id_same_tile_multi_albums_works(self, navi):
         expected = "6tmtPWqaZeEVAFxc2OOP9z"
         actual = navi.get_song_id("21st Century (Digital Boy)", "Bad Religion", "All Ages")
         assert expected == actual
 
-    @pytest.skip
-    def test_get_song_id_same_tile_same_album_returns_empty(self, navi):
+    @pytest.mark.skip(reason="need to set up test data")
+    def test_multi_match_errors(self, navi):
         # this is a spurious pass, we might need to seed some test data for this use case
-        expected = ""
-        actual = navi.get_song_id("Amaranth", "Nightwish", "Dark Passion Play (special edition)")
-        assert expected == actual
+        with pytest.raises(navidrome.MultiMatchError):
+            navi.get_song_id("Amaranth", "Nightwish", "Dark Passion Play (special edition)")
