@@ -54,7 +54,7 @@ class Navidrome:
         results = self.conn.search2(title)
 
         if results.song is None:
-            raise NoTitleMatchError(f"title {title} had no matches")
+            raise NoTitleMatchError(f"title '{title}' had no matches")
 
         if len(results.song) == 1:
             print(f"title {title} was unique!")
@@ -68,13 +68,13 @@ class Navidrome:
                 potential_songs.append(song)
 
         if len(potential_songs) == 1:
-            print(f"title {title} with artist {artist} and album {album} was unique!")
+            print(f"title '{title}' with artist '{artist}' and album '{album}' was unique!")
             return potential_songs[0].id
         if not len(potential_songs):
-            raise NoComboMatchError(f"title {title} by {artist} on {album} did not match, find it manually")
+            raise NoComboMatchError(f"title '{title}' by '{artist}' on '{album}' did not match")
         else:
             ids = [song.id for song in potential_songs]
-            raise MultiMatchError(f"title {title} by {artist} on{album} had multiple matches {ids}, isolate it manually")
+            raise MultiMatchError(f"title '{title}' by '{artist}' on '{album}' had multiple matches {ids}")
 
 class NoTitleMatchError(ValueError):
     def __init__(self, message):

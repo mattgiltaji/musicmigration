@@ -21,11 +21,11 @@ def main() -> None:
         for row in ex.df.itertuples():
 
             if pd.isnull(row.song_id):
-                song_id = navi.get_song_id(row.song, row.artist, row.album)
-                # TODO: see if the song_id is valid
-                # its valid, save it for later
-                ex.df.at[row.Index, "song_id"] = song_id
-                # not valid, write the failure to notes and move to next
+                try:
+                    song_id = navi.get_song_id(row.song, row.artist, row.album)
+                    ex.df.at[row.Index, "song_id"] = song_id
+                except ValueError as err:
+                    ex.df.at[row.Index, "notes"] = str(err)
             else:
                 song_id = row.song_id
 
