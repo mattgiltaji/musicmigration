@@ -96,7 +96,9 @@ class Navidrome:
 
         song = self.conn.get_song(song_id)
         current_count = song.play_count
-        if current_count > count > 20:
+        if not current_count:
+            current_count = 0
+        if current_count >= count > 20:
             raise AlreadySuperScrobbledError(f"song '{song.title}' already has more than {count} plays")
 
         timestamp = datetime.strptime(date, "%m/%d/%Y")
