@@ -13,6 +13,16 @@ def navi():
     with navidrome.Navidrome(url, user, password) as navi:
         yield navi
 
+@pytest.fixture
+def sample_song_id():
+    # safe to scrobble and such
+    return "6TuhFkipm48hScmJwIAaKR"
+
+@pytest.fixture
+def many_plays_song_id():
+    # safe to scrobble and such
+    return "5SIkkSbiynLChzFkYQ6zCg"
+
 class TestNavidrome:
     def test_connect_works_with_rando_urls(self):
         navi = navidrome.Navidrome("https://google.com", "username", "password")
@@ -21,6 +31,11 @@ class TestNavidrome:
     def test_context_manager_works(self):
         with navidrome.Navidrome("https://google.com", "username", "password", 443):
             pass
+
+    def test_get_song_without_init_fails(self):
+        navi = navidrome.Navidrome("https://google.com", "username", "password")
+        with pytest.raises(RuntimeError):
+            navi.get_song_id("Test", "Test", "Test")
 
     def test_get_unique_song_id_works(self, navi):
         expected = "3jiXfwp63oU0n2WYhHEgxd"
@@ -40,8 +55,24 @@ class TestNavidrome:
         actual = navi.get_song_id("21st Century (Digital Boy)", "Bad Religion", "All Ages")
         assert expected == actual
 
-    @pytest.mark.skip(reason="need to set up test data")
     def test_multi_match_errors(self, navi):
         # this is a spurious pass, we might need to seed some test data for this use case
         with pytest.raises(navidrome.MultiMatchError):
-            navi.get_song_id("Amaranth", "Nightwish", "Dark Passion Play (special edition)")
+            navi.get_song_id("Sample 5", "Test Artist", "Test Album")
+
+    def test_super_scrobble_without_init_fails(self, sample_song_id):
+        navi = navidrome.Navidrome("https://google.com", "username", "password")
+        with pytest.raises(RuntimeError):
+            navi.super_scrobble(sample_song_id, 1, "1/1/2021")
+
+    def test_super_scrobble_errors_on_high_current_playcount(self, navi, many_plays_song_id):
+        with pytest.raises(navidrome.AlreadySuperScrobbledError):
+            navi.super_scrobble(many_plays_song_id, 21, "1/1/2021")
+
+    def test_super_scrobble_works_on_low_count_high_playcount(self, navi, many_plays_song_id):
+        iterations = 3
+        current = navi.conn.get_song(many_plays_song_id).play_count
+        expected = current + iterations
+        navi.super_scrobble(many_plays_song_id, iterations, "1/1/2021")
+        actual = navi.conn.get_song(many_plays_song_id).play_count
+        assert expected == actual

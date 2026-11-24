@@ -1,5 +1,6 @@
 import libopensonic
 from types import TracebackType
+from datetime import datetime
 
 class Navidrome:
     def __init__(self, url:str, username:str, password:str, port=443):
@@ -48,7 +49,7 @@ class Navidrome:
         :return: song id
         """
         if self.conn is None:
-            self.conn = self.connect()
+            raise RuntimeError(f"called get_song_id() without connecting to navidrome")
 
         # Search the song title alone, maybe we'll get lucky
         results = self.conn.search2(title)
@@ -76,6 +77,40 @@ class Navidrome:
             ids = [song.id for song in potential_songs]
             raise MultiMatchError(f"title '{title}' by '{artist}' on '{album}' had multiple matches {ids}")
 
+    def super_scrobble(self, song_id, count, date):
+        """
+        Repeatedly scrobbles a song to bump its play count up.
+
+        Note that this will add 'count' to its play count, not replace the play count with count.
+
+        Some accidental re-run protections:
+            For larger counts (over 20), error if the song's play count is already higher than count
+
+        :param song_id: song id to scrobble
+        :param count: the number of times to scrobble
+        :param date: the date to scrobble (will become last played date on a song that has not been played yet)
+        :return:
+        """
+        if self.conn is None:
+            raise RuntimeError(f"called super_scrobble() without connecting to navidrome")
+
+        song = self.conn.get_song(song_id)
+        current_count = song.play_count
+        if current_count > count > 20:
+            raise AlreadySuperScrobbledError(f"song '{song.title}' already has more than {count} plays")
+
+        timestamp = datetime.strptime(date, "%m/%d/%Y")
+        unix_timestamp = int(timestamp.timestamp())
+        print(f"super scrobbling {song.title} {count} times")
+
+        scrobbles = 0
+        while scrobbles < count:
+            scrobbles += 1
+            response = self.conn.scrobble(song_id, listen_time=unix_timestamp)
+            if not response:
+                raise RuntimeError(f"Scrobble {scrobbles} of {count} for id {song_id} failed, check navidrome logs")
+
+
 class NoTitleMatchError(ValueError):
     def __init__(self, message):
         super().__init__(message)
@@ -85,5 +120,9 @@ class NoComboMatchError(ValueError):
         super().__init__(message)
 
 class MultiMatchError(ValueError):
+    def __init__(self, message):
+        super().__init__(message)
+
+class AlreadySuperScrobbledError(ValueError):
     def __init__(self, message):
         super().__init__(message)
