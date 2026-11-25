@@ -65,7 +65,7 @@ class Navidrome:
         # loop over results, see if artist and album will differentiate
         potential_songs = []
         for song in results.song:
-            if artist in song.artist and album in song.album and title in song.title:
+            if artist.upper() in song.artist.upper() and album.upper() in song.album.upper() and title.upper() in song.title.upper():
                 potential_songs.append(song)
 
         if len(potential_songs) == 1:
