@@ -1,4 +1,5 @@
 import libopensonic
+import unicodedata
 from types import TracebackType
 from datetime import datetime
 
@@ -38,7 +39,6 @@ class Navidrome:
         self.conn.cleanup()
         self.conn = None
 
-
     def get_song_id(self, title, artist, album) -> str:
         """
         Search navidrome for a song ID based on the song's title, artist, and album
@@ -65,7 +65,11 @@ class Navidrome:
         # loop over results, see if artist and album will differentiate
         potential_songs = []
         for song in results.song:
-            if artist.upper() in song.artist.upper() and album.upper() in song.album.upper() and title.upper() in song.title.upper():
+            if (
+                    self.standardized(artist) in self.standardized(song.artist)
+                    and self.standardized(album) in self.standardized(song.album)
+                    and self.standardized(title) in self.standardized(song.title)
+            ):
                 potential_songs.append(song)
 
         if len(potential_songs) == 1:
@@ -76,6 +80,21 @@ class Navidrome:
         else:
             ids = [song.id for song in potential_songs]
             raise MultiMatchError(f"title '{title}' by '{artist}' on '{album}' had multiple matches {ids}")
+
+    @staticmethod
+    def standardized(s) -> str:
+        """
+        Ease our song title/artist/album comparisons by casefolding, Unicode normalization, and fixing fancy apostrophes
+        :param s: string to standardize
+        :return: standardized string
+        """
+        APOSTROPHE_VARIANTS = '\u0060\u00B4\u2018\u2019\u201B\u2032\u2035\u02B9\u02BC\u02C8\u0313\u0315\u055A\u05F3\u07F4\u07F5\uFF07\u1FBF\u1FBD\uA78C'
+        cased = s.casefold()
+        converted = cased
+        for char in APOSTROPHE_VARIANTS:
+            converted = converted.replace(char, "'")
+        normed = unicodedata.normalize('NFKD', converted)
+        return normed
 
     def super_scrobble(self, song_id, count, date):
         """

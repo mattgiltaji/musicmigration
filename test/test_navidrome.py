@@ -55,6 +55,15 @@ class TestNavidrome:
         actual = navi.get_song_id("21st Century (Digital Boy)", "Bad Religion", "All Ages")
         assert expected == actual
 
+    @pytest.mark.parametrize("test_input, expected", [
+        ("Apostrophe Can’`'‛t", "apostrophe can''''t"),
+        ("normalize ﬃ", "normalize ffi"),
+        ("CaSe FoLdInG sTrAße", "case folding strasse"),
+    ])
+    def test_standardized_works(self, test_input, expected):
+        actual = navidrome.Navidrome.standardized(test_input)
+        assert expected == actual
+
     def test_multi_match_errors(self, navi):
         # this is a spurious pass, we might need to seed some test data for this use case
         with pytest.raises(navidrome.MultiMatchError):
