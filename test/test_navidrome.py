@@ -85,3 +85,12 @@ class TestNavidrome:
         navi.super_scrobble(many_plays_song_id, iterations, "1/1/2021")
         actual = navi.conn.get_song(many_plays_song_id).play_count
         assert expected == actual
+
+    # def test_manual_super_scrobble(self, navi):
+    #     # one of the songs didn't get merged, gotta run a second batch manually
+    #     song_id = "61WUgcAACiqLtPp3K2qsPz"
+    #     current = navi.conn.get_song(song_id).play_count
+    #     expected = 134
+    #     navi.super_scrobble(song_id, 13, "9/20/2024")
+    #     actual = navi.conn.get_song(song_id).play_count
+    #     assert expected == actual
